@@ -4,38 +4,48 @@ import ExpenseFilter from "./ExpenseTacker/Components/ExpenseFilter/ExpenseFilte
 import ExpenseForm from "./ExpenseTacker/Components/ExpenseForm/ExpenseForm";
 import categories from "./ExpenseTacker/categories";
 
+interface Expense {
+  id: number;
+  description: string;
+  amount: number;
+  category: string;
+}
 
 function App() {
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [expenses, setExpanses] = useState([
-    { id: 1, description: "Pasta", amount: 5, category: "Groceries" },
-    { id: 2, description: "Microwave", amount: 5, category: "Utilities" },
-    { id: 3, description: "LunaPark", amount: 5, category: "Entertaiment" },
-    { id: 4, description: "Pasta", amount: 5, category: "Groceries" },
-  ]);
+  const [expenses, setExpanses] = useState<Expense[] | null>(null);
 
   const visibleExpanses = selectedCategory
-    ? expenses.filter((e) => e.category === selectedCategory)
+    ? expenses?.filter((e: Expense) => e.category === selectedCategory)
     : expenses;
+  if (expenses === null) {
+    return <div>The table is empty</div>;
+  } else {
+    return (
+      <div>
+        <div className="mb-5">
+          <ExpenseForm
+            onSubmbit={(newExpense) =>
+              setExpanses([
+                ...(expenses || []),
+                { ...newExpense, id: expenses.length + 1 },
+              ])
+            }
+          />
+        </div>
+        <div className="mb-3">
+          <ExpenseFilter
+            onSelectCategory={(category) => setSelectedCategory(category)}
+          ></ExpenseFilter>
+        </div>
 
-  return (
-    <div>
-      <div className="mb-5">
-        <ExpenseForm onSubmbit={newExpense => setExpanses([...expenses, { ...newExpense, id: expenses.length + 1 }]
-        )} />
+        <ExpenseList
+          expenses={visibleExpanses === null ?}
+          onDelete={(id) => setExpanses(expenses.filter((e) => e.id != id))}
+        />
       </div>
-      <div className="mb-3">
-        <ExpenseFilter
-          onSelectCategory={(category) => setSelectedCategory(category)}
-        ></ExpenseFilter>
-      </div>
-
-      <ExpenseList
-        expenses={visibleExpanses}
-        onDelete={(id) => setExpanses(expenses.filter((e) => e.id != id))}
-      />
-    </div>
-  );
+    );
+  }
 }
 
 export default App;
