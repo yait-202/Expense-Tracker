@@ -13,12 +13,12 @@ interface Expense {
 
 function App() {
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [expenses, setExpanses] = useState<Expense[] | null>(null);
+  const [expenses, setExpanses] = useState<Expense[] | null>([]);
 
-  const visibleExpanses = selectedCategory
+  const visibleExpenses = selectedCategory
     ? expenses?.filter((e: Expense) => e.category === selectedCategory)
     : expenses;
-  if (expenses === null) {
+  if (expenses === null || visibleExpenses === null) {
     return <div>The table is empty</div>;
   } else {
     return (
@@ -27,7 +27,7 @@ function App() {
           <ExpenseForm
             onSubmbit={(newExpense) =>
               setExpanses([
-                ...(expenses || []),
+                ...(expenses || null),
                 { ...newExpense, id: expenses.length + 1 },
               ])
             }
@@ -40,7 +40,7 @@ function App() {
         </div>
 
         <ExpenseList
-          expenses={visibleExpanses === null ?}
+          expenses={visibleExpenses}
           onDelete={(id) => setExpanses(expenses.filter((e) => e.id != id))}
         />
       </div>
