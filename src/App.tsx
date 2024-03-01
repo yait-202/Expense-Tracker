@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ExpenseList from "./ExpenseTacker/Components/ExpenseList/ExpenseList";
 import ExpenseFilter from "./ExpenseTacker/Components/ExpenseFilter/ExpenseFilter";
 import ExpenseForm from "./ExpenseTacker/Components/ExpenseForm/ExpenseForm";
@@ -13,7 +13,8 @@ interface Expense {
 
 function App() {
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [expenses, setExpanses] = useState<Expense[] | null>([]);
+  const [expenses, setExpenses] = useState<Expense[] | null>([]);
+
 
   const visibleExpenses = selectedCategory
     ? expenses?.filter((e: Expense) => e.category === selectedCategory)
@@ -26,7 +27,7 @@ function App() {
         <div className="mb-5">
           <ExpenseForm
             onSubmbit={(newExpense) =>
-              setExpanses([
+              setExpenses([
                 ...(expenses || null),
                 { ...newExpense, id: expenses.length + 1 },
               ])
@@ -41,7 +42,7 @@ function App() {
 
         <ExpenseList
           expenses={visibleExpenses}
-          onDelete={(id) => setExpanses(expenses.filter((e) => e.id != id))}
+          onDelete={(id) => setExpenses(expenses.filter((e) => e.id != id))}
         />
       </div>
     );

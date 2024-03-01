@@ -5,6 +5,7 @@ import categories from "../../categories";
 import { MdOutlineCategory } from "react-icons/md";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
 import { TbFileDescription } from "react-icons/tb";
+import { useEffect, useState } from "react";
 
 const schema = z.object({
   description: z
@@ -27,6 +28,28 @@ interface Props {
 }
 
 const ExpenseForm = ({ onSubmbit }: Props) => {
+  const [description_, setDescription] = useState("");
+  const [price_, setPrice] = useState<number>();
+  const [category_, setCategory] = useState("");
+  const [disabled, setDisabled] = useState(true);
+
+  useEffect(() => {
+    setDisabled(validation());
+  }, [description_, price_, category_]);
+
+  const validation = () => {
+    if (
+      description_ === "" ||
+      price_ === undefined ||
+      price_ === null ||
+      category_ === ""
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   const {
     register,
     handleSubmit,
@@ -35,7 +58,16 @@ const ExpenseForm = ({ onSubmbit }: Props) => {
   } = useForm<ExpenseFormData>({ resolver: zodResolver(schema) });
 
   return (
-    <form onSubmit={handleSubmit(data => { onSubmbit(data); reset(); })}>
+    <form
+      onSubmit={handleSubmit((data) => {
+        onSubmbit(data);
+        setDescription: "";
+        setPrice: undefined;
+        setCategory: "";
+        setDisabled: true;
+        reset();
+      })}
+    >
       <div className="mb-3">
         <label htmlFor="description" className="form-label">
           <TbFileDescription /> Description
@@ -45,6 +77,9 @@ const ExpenseForm = ({ onSubmbit }: Props) => {
           id="description"
           type="text"
           className="form-control"
+          onChange={(event) => {
+            setDescription(event.target.value);
+          }}
         />
         {errors.description && (
           <p className="text-danger">{errors.description.message}</p>
@@ -59,6 +94,9 @@ const ExpenseForm = ({ onSubmbit }: Props) => {
           id="amount"
           type="number"
           className="form-control"
+          onChange={(event) => {
+            setPrice(event.target.valueAsNumber);
+          }}
         />
         {errors.amount && (
           <p className="text-danger">{errors.amount.message}</p>
@@ -68,7 +106,12 @@ const ExpenseForm = ({ onSubmbit }: Props) => {
         <label htmlFor="category" className="form-label">
           <MdOutlineCategory /> Category
         </label>
-        <select {...register("category")} id="category" className="form-select">
+        <select
+          {...register("category")}
+          id="category"
+          className="form-select"
+          onChange={(event) => setCategory(event.target.value)}
+        >
           <option value=""></option>
           {categories.map((category) => (
             <option key={category} value={category}>
@@ -80,7 +123,9 @@ const ExpenseForm = ({ onSubmbit }: Props) => {
           <p className="text-danger"> {errors.category.message}</p>
         )}
       </div>
-      <button className="btn btn-primary">Submit</button>
+      <button className="btn btn-primary" disabled={disabled}>
+        Submit
+      </button>
     </form>
   );
 };
